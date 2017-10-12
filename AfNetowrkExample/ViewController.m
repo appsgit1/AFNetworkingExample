@@ -1,5 +1,6 @@
 #import "ViewController.h"
 #import "AFNetworking.h"
+#import "UIImage+ImageHelper.h"
 
 @interface ViewController ()
 
@@ -8,7 +9,7 @@
 @implementation ViewController
 
 //Server url for the file upload handling.
-static NSString *ServerPath = @"http://appsgit.com/appsgit-service/fileupload.php";
+static NSString *ServerPath = @"https://appsgit.com/appsgit-service/fileupload.php";
 
 
 - (void)viewDidLoad {
@@ -104,7 +105,7 @@ static NSString *ServerPath = @"http://appsgit.com/appsgit-service/fileupload.ph
         
         NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:ServerPath parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
             
-            [formData appendPartWithFileURL:fileURL name:@"file" fileName:@"file.jpg" mimeType:@"image/jpeg" error:nil];
+            [formData appendPartWithFileURL:fileURL name:@"fileToUpload" fileName:@"file.jpg" mimeType:@"image/jpeg" error:nil];
             
             NSData *fileNameconvertedToUTF8data = [@"my_file_name.jpg" dataUsingEncoding:NSUTF8StringEncoding];
             
@@ -156,12 +157,9 @@ static NSString *ServerPath = @"http://appsgit.com/appsgit-service/fileupload.ph
     
     UIImage *chosenImage = info[UIImagePickerControllerOriginalImage];
     
-    //compress the image before upload. bigger size images takes tiime to upload.
-    NSData *imageData = UIImageJPEGRepresentation(chosenImage, 0.5);
+    self.image = [chosenImage scaleToFitWidth:500.0f];
     
-    self.image = [UIImage imageWithData:imageData];
-    
-    self.imageView.image = [UIImage imageWithData:imageData];
+    self.imageView.image = self.image;
     
     [picker dismissViewControllerAnimated:YES completion:NULL];
     
