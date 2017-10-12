@@ -95,15 +95,21 @@ static NSString *ServerPath = @"https://appsgit.com/appsgit-service/fileupload.p
         NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:path];
         
         
+        AFHTTPRequestSerializer *requestSerializer = [AFHTTPRequestSerializer serializer];
+        
+        [requestSerializer setValue:@"multipart/form-data" forHTTPHeaderField:@"content-type"];
+        
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
         
         AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
         
         manager.responseSerializer = [AFHTTPResponseSerializer serializer];
         
-        manager.operationQueue.maxConcurrentOperationCount = 2; //set to max downloads at once.
+        manager.securityPolicy.allowInvalidCertificates = YES; // not recommended for production
         
-        NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:ServerPath parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+        manager.securityPolicy.validatesDomainName = NO;
+        
+        NSMutableURLRequest *request = [requestSerializer multipartFormRequestWithMethod:@"POST" URLString:ServerPath parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
             
             [formData appendPartWithFileURL:fileURL name:@"fileToUpload" fileName:@"file.jpg" mimeType:@"image/jpeg" error:nil];
             
@@ -159,13 +165,34 @@ static NSString *ServerPath = @"https://appsgit.com/appsgit-service/fileupload.p
     
     //reduce the image width by calling scaleToFitWidth.
     //scaleToFitWidth is implemented in UIImage+ImageHelper category.
-    self.image = [chosenImage scaleToFitWidth:500.0f];
+    //self.image = [chosenImage scaleToFitWidth:500.0f];
+
+    
+    self.image = [self imageWithImage:chosenImage scaledToSize:CGSizeMake(500, 500)];
     
     self.imageView.image = self.image;
     
     [picker dismissViewControllerAnimated:YES completion:NULL];
     
 }
+
+//Reduce the width and height of the image in order to reduce the size.
+
+- (UIImage*)imageWithImage:(UIImage*)image scaledToSize:(CGSize)newSize {
+    
+    UIGraphicsBeginImageContext( newSize );
+    
+    [image drawInRect:CGRectMake(0,0,newSize.width,newSize.height)];
+    
+    UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    return newImage;
+    
+}
+
+
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     
