@@ -157,6 +157,8 @@ static NSString *ServerPath = @"https://appsgit.com/appsgit-service/fileupload.p
     
     UIImage *chosenImage = info[UIImagePickerControllerOriginalImage];
     
+    //reduce the image width by calling scaleToFitWidth.
+    //scaleToFitWidth is implemented in UIImage+ImageHelper category.
     self.image = [chosenImage scaleToFitWidth:500.0f];
     
     self.imageView.image = self.image;

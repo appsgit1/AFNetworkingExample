@@ -7,6 +7,8 @@ target 'AfNetowrkExample' do
 
   # Pods for AfNetowrkExample
 
+  pod 'AFNetworking', '~> 3.0'
+
   target 'AfNetowrkExampleTests' do
     inherit! :search_paths
     # Pods for testing
